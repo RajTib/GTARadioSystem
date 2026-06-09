@@ -14,6 +14,7 @@ namespace GTARadioSystem
         private RadioEngine engine;
         private int songTimer = 0;
         private Song previousSong = null;
+        private bool playlistLoaded = false;
 
         // ============================= Initialization  =============================
         private async Task Initialize()
@@ -21,6 +22,8 @@ namespace GTARadioSystem
             List<Song> songs = await spotify.GetPlaylist();
             engine.LoadPlaylist(songs);
             engine.ShufflePlaylist();
+
+            playlistLoaded = true;
         }
 
         // ============================= Constructor  =============================
@@ -42,19 +45,32 @@ namespace GTARadioSystem
 
         private void OnTick(object sender, EventArgs e)
         {
+            if (!playlistLoaded)
+            {
+                return;
+            }
+
             bool isInCar = Game.LocalPlayerPed.IsInVehicle();
 
             if (isInCar)
             {
                 if (songTimer > 0)
                     songTimer--;
-                else{                     
+                else                     
+                {
+
                     Song currentSong = engine.GetCurrentSong();
-                    if (currentSong != null && currentSong != previousSong)
+                    
+                    if (currentSong != null)
                     {
-                        ShowNowPlaying(currentSong.Title, currentSong.Artist);
-                        previousSong = currentSong;
-                        songTimer = currentSong.Duration * 1000 / 50; // Convert to ticks
+                        if (currentSong != previousSong)
+                        {
+                            ShowNowPlaying(currentSong.Title, currentSong.Artist);
+                            previousSong = currentSong;
+                        }
+
+                        songTimer = currentSong.Duration * 60; // Convert to ticks
+                        engine.NextSong();
                     }
                 }
             }
@@ -80,9 +96,6 @@ namespace GTARadioSystem
                 {
                     Vehicle vehicle = Game.LocalPlayerPed.CurrentVehicle;
                     Song currentSong = engine.GetCurrentSong();
-
-                    if (currentSong != null)
-                        ShowNowPlaying(currentSong.Title, currentSong.Artist);
 
                     // Notification.Show("Vehicle: " + vehicle.DisplayName);
                     vehicle.RadioStation = RadioStation.SelfRadio;
