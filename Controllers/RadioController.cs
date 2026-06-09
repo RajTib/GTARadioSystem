@@ -108,7 +108,7 @@ namespace GTARadioSystem
                     // Notification.Show("Vehicle: " + vehicle.DisplayName);
                     vehicle.RadioStation = RadioStation.SelfRadio;
 
-                    Notification.Show(vehicle.RadioStation.ToString());
+                    Notification.Show("Self Radio");
                 }
             }
 

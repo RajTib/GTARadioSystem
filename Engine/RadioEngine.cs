@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Threading;
 using System.IO;
 
+using GTARadioSystem.Models;
+
 class RadioEngine
 {
     private List<Song> playlist;
