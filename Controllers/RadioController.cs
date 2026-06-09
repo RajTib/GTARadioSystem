@@ -1,6 +1,9 @@
 ﻿using GTA;
 using GTA.UI;
 using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using GTARadioSystem.Models;
 namespace GTARadioSystem
 {
     public class RadioController : Script
@@ -9,6 +12,8 @@ namespace GTARadioSystem
         private int vehicleDelay = 0;
         private SpotifyProvider spotify;
         private RadioEngine engine;
+        private int songTimer = 0;
+        private Song previousSong = null;
 
         // ============================= Initialization  =============================
         private async Task Initialize()
@@ -24,7 +29,7 @@ namespace GTARadioSystem
             spotify = new SpotifyProvider();
             engine = new RadioEngine();
 
-            Initialize();
+            _ = Initialize();
 
             Tick += OnTick;
         }
@@ -38,6 +43,21 @@ namespace GTARadioSystem
         private void OnTick(object sender, EventArgs e)
         {
             bool isInCar = Game.LocalPlayerPed.IsInVehicle();
+
+            if (isInCar)
+            {
+                if (songTimer > 0)
+                    songTimer--;
+                else{                     
+                    Song currentSong = engine.GetCurrentSong();
+                    if (currentSong != null && currentSong != previousSong)
+                    {
+                        ShowNowPlaying(currentSong.Title, currentSong.Artist);
+                        previousSong = currentSong;
+                        songTimer = currentSong.Duration * 1000 / 50; // Convert to ticks
+                    }
+                }
+            }
 
             // Vehicle Entered
             if (!wasInCar && isInCar)
