@@ -1,5 +1,4 @@
-﻿using System.Runtime.CompilerServices;
-using SpotifyAPI.Web;
+﻿using SpotifyAPI.Web;
 using SpotifyAPI.Web.Auth;
 using GTARadioSystem.Models;
 
