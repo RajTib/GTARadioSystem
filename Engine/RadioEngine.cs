@@ -5,60 +5,44 @@ using System.IO;
 
 class RadioEngine
 {
-    static  string workingDir = Directory.GetCurrentDirectory();
-    static string filePath = Path.Combine(workingDir, "playlists.txt");
-    static string[] lines = File.ReadAllLines(filePath);
-    static Random rng = new Random();
+    private List<Song> playlist;
+    private int currentSongIndex;
+    private Random rng;
 
-    static void Main()
+    public RadioEngine()
     {
-        List<Song> playlist = new List<Song>();
+        playlist = new List<Song>();
+        currentSongIndex = 0;
+        rng = new Random();
+    }
 
-        foreach (string line in lines)
+    public void LoadPlaylist(List<Song> songs)
+    {
+        playlist = songs;
+        currentSongIndex = 0;
+    }
+
+    public Song GetCurrentSong()
+    {
+        if (playlist.Count == 0)
         {
-            playlist.Add(parseSong(line));
-        }
+            return null;
+        }   
 
-        while (true)
+        return playlist[currentSongIndex];
+    }
+
+    public void NextSong()
+    {
+        currentSongIndex++;
+
+        if (currentSongIndex >= playlist.Count)
         {
-            ShufflePlaylist(playlist);
-
-            foreach (Song song in playlist)
-            {
-                playSong(song);
-            }
+            currentSongIndex = 0;
         }
     }
 
-    static void playSong(Song song)
-    {
-        Console.Clear();
-
-        Console.WriteLine("================================");
-        Console.WriteLine("        SPOTIFY FM");
-        Console.WriteLine("================================");
-
-        Console.WriteLine();
-        Console.WriteLine($"Now Playing: {song.Title}");
-        Console.WriteLine($"Artist: {song.Artist}");
-
-        Thread.Sleep(song.Duration * 1000);
-    }
-
-    static Song parseSong(string line)
-    {
-        string[] parts = line.Split(",");
-        Song song = new Song();
-        int duration = int.Parse(parts[2]);
-
-        song.Title = parts[0];
-        song.Artist = parts[1];
-        song.Duration = duration;
-
-        return song;
-    }
-
-    static void ShufflePlaylist(List<Song> playlist)
+    public void ShufflePlaylist()
     {
         for (int i = playlist.Count - 1; i > 0; i--)
         {
@@ -68,5 +52,7 @@ class RadioEngine
             playlist[i] = playlist[j];
             playlist[j] = temp;
         }
+
+        currentSongIndex = 0;
     }
 }
