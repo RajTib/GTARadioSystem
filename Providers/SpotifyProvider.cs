@@ -1,10 +1,11 @@
 ﻿using System.Runtime.CompilerServices;
 using SpotifyAPI.Web;
 using SpotifyAPI.Web.Auth;
+using GTARadioSystem.Models;
 
-class SpotifyProvider
+public class SpotifyProvider
 {
-    static async Task Main()
+    public async Task<List<Song>> GetPlaylist()
     {
         Dictionary<string, string> env = new Dictionary<string, string>();
 
@@ -18,7 +19,9 @@ class SpotifyProvider
         string clientId = env["SPOTIFY_CLIENT_ID"];
         string clientSecret = env["SPOTIFY_CLIENT_SECRET"];
         string playlistId = env["PLAYLIST_ID"];
-        
+
+        List<Song> playlist = new List<Song>();
+
         var server = new EmbedIOAuthServer(
             new Uri("http://127.0.0.1:5000/callback"),
             5000);
@@ -28,8 +31,6 @@ class SpotifyProvider
         server.AuthorizationCodeReceived += async (sender, response) =>
         {
             await server.Stop();
-
-            Console.WriteLine("Authorization successful!");
 
             var token =
                 await new OAuthClient().RequestToken(
@@ -41,29 +42,20 @@ class SpotifyProvider
 
             var spotify = new SpotifyClient(token.AccessToken);
 
-            string playlistId = "59sHwgujUkNHEIPyIlDtuP";
-
             var tracks =
                 await spotify.Playlists.GetPlaylistItems(
                     playlistId);
-
-            Console.WriteLine("Playlist items fetched!");
-
-            Console.WriteLine(
-                $"Items count: {tracks.Items.Count}"
-            );
 
             foreach (var item in tracks.Items)
             {
                 if (item.Item is FullTrack track)
                 {
-                    Console.WriteLine(track.Name);
+                    Song song = new Song();
+                    song.Title = track.Name;
+                    song.Artist = track.Artists[0].Name;
+                    song.Duration = track.DurationMs / 1000;
 
-                    Console.WriteLine(track.Artists[0].Name);
-
-                    Console.WriteLine(track.DurationMs / 1000);
-
-                    Console.WriteLine("----------------");
+                    playlist.Add(song);
                 }
             }
         };
@@ -82,7 +74,11 @@ class SpotifyProvider
 
         BrowserUtil.Open(request.ToUri());
 
-        Console.WriteLine("Press Enter to exit...");
-        Console.ReadLine();
+        while (playlist.Count == 0)
+        {
+            await Task.Delay(500);
+        }
+
+        return playlist;
     }
 }
