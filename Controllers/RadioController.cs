@@ -1,29 +1,32 @@
 ﻿using GTA;
 using GTA.UI;
 using System;
-using System.IO;
-using System.Net.Mail;
 namespace GTARadioSystem
 {
     public class RadioController : Script
     {
         private bool wasInCar = false;
-        private SpotifyController spotify;
         private int vehicleDelay = 0;
-        private string lastSong = "";
-        private string lastArtist = "";
-        private int songCheckDelay = 0;
+        private SpotifyProvider spotify;
+        private RadioEngine engine;
+
+        // ============================= Initialization  =============================
+        private async Task Initialize()
+        {
+            List<Song> songs = await spotify.GetPlaylist();
+            engine.LoadPlaylist(songs);
+            engine.ShufflePlaylist();
+        }
 
         // ============================= Constructor  =============================
-        [Obsolete]
         public RadioController()
         {
-            spotify = new SpotifyController();
+            spotify = new SpotifyProvider();
+            engine = new RadioEngine();
+
+            Initialize();
 
             Tick += OnTick;
-            // Notification.Show("Radio Controller Initialized");
-
-            spotify.Test();
         }
 
         // ============================= Methods  =============================
@@ -32,7 +35,6 @@ namespace GTARadioSystem
             Notification.Show($"♫ {title}~n~{artist}");
         }
 
-        [Obsolete]
         private void OnTick(object sender, EventArgs e)
         {
             bool isInCar = Game.LocalPlayerPed.IsInVehicle();
@@ -57,38 +59,15 @@ namespace GTARadioSystem
                 if (vehicleDelay == 0)
                 {
                     Vehicle vehicle = Game.LocalPlayerPed.CurrentVehicle;
+                    Song currentSong = engine.GetCurrentSong();
+
+                    if (currentSong != null)
+                        ShowNowPlaying(currentSong.Title, currentSong.Artist);
 
                     // Notification.Show("Vehicle: " + vehicle.DisplayName);
                     vehicle.RadioStation = RadioStation.SelfRadio;
 
-                    Notification.show(vehicle.RadioStation.ToString());
-                }
-            }
-
-            if (isInCar)
-            {
-                if (songCheckDelay > 0)
-                {
-                    songCheckDelay--;
-                }
-                else
-                {
-                    string title = spotify.GetCurrentSong();
-                    string artist = spotify.GetCurrentArtist();
-                    Vehicle vehicle = Game.LocalPlayerPed.CurrentVehicle;
-
-                    if (title != lastSong || artist != lastArtist)
-                    {
-                        // ShowNowPlaying(
-                        //     vehicle.RadioStation.ToString(),
-                        //     "Current Radio"
-                        // );
-
-                        lastSong = title;
-                        lastArtist = artist;
-                    }
-
-                    songCheckDelay = 60; // ~1 second
+                    Notification.Show(vehicle.RadioStation.ToString());
                 }
             }
 
