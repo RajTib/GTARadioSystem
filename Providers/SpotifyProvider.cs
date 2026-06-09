@@ -1,5 +1,11 @@
-﻿using SpotifyAPI.Web;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Threading.Tasks;
+
+using SpotifyAPI.Web;
 using SpotifyAPI.Web.Auth;
+
 using GTARadioSystem.Models;
 
 public class SpotifyProvider

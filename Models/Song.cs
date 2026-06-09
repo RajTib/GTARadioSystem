@@ -1,6 +1,9 @@
-class Song
+namespace GTARadioSystem.Models
 {
-    public string Title;
-    public string Artist;
-    public int Duration;
+    public class Song
+    {
+        public string Title;
+        public string Artist;
+        public int Duration;
+    }
 }

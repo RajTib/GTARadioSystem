@@ -23,6 +23,14 @@ namespace GTARadioSystem
             engine.LoadPlaylist(songs);
             engine.ShufflePlaylist();
 
+            Song firstSong = engine.GetCurrentSong();
+
+            if (firstSong != null)
+            {
+                previousSong = firstSong;
+                songTimer = firstSong.Duration * 60;
+            }
+
             playlistLoaded = true;
         }
 
@@ -58,6 +66,7 @@ namespace GTARadioSystem
                     songTimer--;
                 else                     
                 {
+                    engine.NextSong();
 
                     Song currentSong = engine.GetCurrentSong();
                     
@@ -70,7 +79,6 @@ namespace GTARadioSystem
                         }
 
                         songTimer = currentSong.Duration * 60; // Convert to ticks
-                        engine.NextSong();
                     }
                 }
             }
