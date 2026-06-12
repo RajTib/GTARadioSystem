@@ -12,7 +12,7 @@ namespace GTARadioSystem
         [Obsolete]
         public SpotifyController()
         {
-            // Notification.Show("Spotify Controller Initialized");
+            Notification.Show("Spotify Controller Initialized");
         }
 
         [Obsolete]
@@ -20,7 +20,7 @@ namespace GTARadioSystem
         {
             Process[] spotifyProcesses = Process.GetProcessesByName("Spotify");
 
-            // Notification.Show("Spotify Processes Found: " + spotifyProcesses.Length);
+            Notification.Show("Spotify Processes Found: " + spotifyProcesses.Length);
         }
 
         public string GetCurrentSong()

@@ -19,9 +19,16 @@ namespace GTARadioSystem
         // ============================= Initialization  =============================
         private async Task Initialize()
         {
+            //Notification.Show("Initialize Started");
+
             List<Song> songs = await spotify.GetPlaylist();
+            //Notification.Show($"Playlist Retrieved ({songs.Count})");
+
             engine.LoadPlaylist(songs);
+            //Notification.Show("Playlist Loaded Into Engine");
+
             engine.ShufflePlaylist();
+            //Notification.Show("Playlist Shuffled");
 
             Song firstSong = engine.GetCurrentSong();
 
@@ -32,17 +39,23 @@ namespace GTARadioSystem
             }
 
             playlistLoaded = true;
+            //Notification.Show("Initialization Complete");
         }
 
         // ============================= Constructor  =============================
         public RadioController()
         {
+            //Notification.Show("Controller Initialized");
+
             spotify = new SpotifyProvider();
             engine = new RadioEngine();
+
+            //Notification.Show("Objects Created");
 
             _ = Initialize();
 
             Tick += OnTick;
+            //Notification.Show("Tick Registered");
         }
 
         // ============================= Methods  =============================
@@ -64,12 +77,12 @@ namespace GTARadioSystem
             {
                 if (songTimer > 0)
                     songTimer--;
-                else                     
+                else
                 {
                     engine.NextSong();
 
                     Song currentSong = engine.GetCurrentSong();
-                    
+
                     if (currentSong != null)
                     {
                         if (currentSong != previousSong)
@@ -86,14 +99,14 @@ namespace GTARadioSystem
             // Vehicle Entered
             if (!wasInCar && isInCar)
             {
-                // Notification.Show("Entered");
+                //Notification.Show("Entered");
                 vehicleDelay = 60; // ~5 seconds
             }
 
             // Vehicle Exited
             if (wasInCar && !isInCar)
             {
-                // Notification.Show("Exited");
+                //Notification.Show("Exited");
             }
 
             if (vehicleDelay > 0)
@@ -105,10 +118,10 @@ namespace GTARadioSystem
                     Vehicle vehicle = Game.LocalPlayerPed.CurrentVehicle;
                     Song currentSong = engine.GetCurrentSong();
 
-                    // Notification.Show("Vehicle: " + vehicle.DisplayName);
+                    //Notification.Show("Vehicle: " + vehicle.DisplayName);
                     vehicle.RadioStation = RadioStation.SelfRadio;
 
-                    Notification.Show("Self Radio");
+                    //Notification.Show("Self Radio");
                 }
             }
 
